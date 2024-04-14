@@ -16,7 +16,7 @@ const CustomVideoPlayer = ({
   onNextVideo,
   thumbnail,
 }) => {
-  const [isPlaying, setIsPlaying] = useState(autoPlay);
+  const [isPlaying, setIsPlaying] = useState(!autoPlay);
   const [isMuted, setIsMuted] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
