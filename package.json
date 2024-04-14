@@ -1,5 +1,5 @@
 {
-  "name": "rigi-video-player",
+  "name": "video-player",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,9 +9,14 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.5.2",
+    "@fortawesome/free-solid-svg-icons": "^6.5.2",
+    "@fortawesome/react-fontawesome": "^0.2.0",
+    "@hello-pangea/dnd": "^16.6.0",
+    "next": "14.2.1",
     "react": "^18",
     "react-dom": "^18",
-    "next": "14.2.1"
+    "react-icons": "^5.0.1"
   },
   "devDependencies": {
     "postcss": "^8",
