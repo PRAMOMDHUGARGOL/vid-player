@@ -10,7 +10,7 @@ const PlayList = ({ video, currentVideoIndex, index }) => {
       }`}
       style={{ width: "100%" }} // Set a fixed width for each playlist item
     >
-      {/* Content */}
+      {/* Thumbnail */}
       <div className="h-20 w-32 rounded-lg overflow-hidden flex-shrink-0">
         <img
           className="w-full h-full object-cover"
@@ -18,9 +18,10 @@ const PlayList = ({ video, currentVideoIndex, index }) => {
           alt={video.title}
         />
       </div>
+      {/* Content */}
       <div className="flex flex-col flex-grow ml-3">
         <h3
-          className="text-lg font-semibold text-white truncate mb-1"
+          className="text-lg font-semibold text-white mb-1"
           style={{ maxWidth: "200px" }} // Set max width for the title
           title={video.title} // Set title attribute for tooltip
         >
@@ -28,6 +29,7 @@ const PlayList = ({ video, currentVideoIndex, index }) => {
         </h3>
         <p className="text-sm text-gray-300">{video.subtitle}</p>
       </div>
+      {/* Play icon */}
       {isActive && (
         <div className="flex justify-center items-center w-8 h-8 rounded-full bg-blue-500 text-white mr-4">
           <FaPlay />

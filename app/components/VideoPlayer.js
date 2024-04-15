@@ -195,11 +195,16 @@ const CustomVideoPlayer = ({
         toggleFullScreen();
       } else {
         // Listen for orientation change event
-        window.addEventListener("orientationchange", () => {
+        const handleOrientationChange = () => {
           if (isLandscape()) {
             toggleFullScreen();
+            window.removeEventListener(
+              "orientationchange",
+              handleOrientationChange
+            );
           }
-        });
+        };
+        window.addEventListener("orientationchange", handleOrientationChange);
       }
     }
   };
@@ -251,8 +256,8 @@ const CustomVideoPlayer = ({
           className="w-full  accent-blue-500"
         />
 
-        <div className="controls flex items-center justify-between">
-          <div className="flex items-center">
+        <div className="controls flex items-center justify-between flex-wrap">
+          <div className="flex items-center mb-2 md:mb-0">
             <button onClick={handlePlayPauseClick} className="mr-4">
               {isPlaying ? (
                 <FontAwesomeIcon icon={faPause} />
@@ -263,9 +268,9 @@ const CustomVideoPlayer = ({
             <button onClick={handleStopClick} className="mr-4">
               <FontAwesomeIcon icon={faStop} />
             </button>
-            <span className="mr-2">{formatTime(currentTime)}</span> /{" "}
-            <span className="ml-2 mr-4">{formatTime(duration)}</span>
-            <button onClick={handleMuteClick} className="mr-4">
+            <span className="mr-2 md:mr-4">{formatTime(currentTime)}</span> /{" "}
+            <span className="ml-2 md:ml-4">{formatTime(duration)}</span>
+            <button onClick={handleMuteClick} className="mr-4 ml-auto md:ml-4">
               {isMuted ? (
                 <FontAwesomeIcon icon={faVolumeMute} />
               ) : (
@@ -286,7 +291,7 @@ const CustomVideoPlayer = ({
             <select
               value={speed}
               onChange={handleSpeedChange}
-              className="bg-transparent text-white px-2 py-1 rounded-md focus:outline-none mr-4"
+              className="bg-transparent text-white px-2 py-1 rounded-md focus:outline-none mr-4 mb-2 md:mb-0"
             >
               <option value="0.5">0.5x</option>
               <option value="1">1x</option>
