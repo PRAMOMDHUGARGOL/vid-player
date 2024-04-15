@@ -23,6 +23,8 @@ const CustomVideoPlayer = ({
   const [duration, setDuration] = useState(0);
   const [speed, setSpeed] = useState(1);
   const [isControlsVisible, setIsControlsVisible] = useState(true);
+  const [volume, setVolume] = useState(0.5); // Initial volume level
+
   const videoRef = useRef(null);
   const controlsTimeoutRef = useRef(null);
 
@@ -104,6 +106,12 @@ const CustomVideoPlayer = ({
     togglePlayPause();
   };
 
+  const handleVolumeChange = (event) => {
+    const newVolume = parseFloat(event.target.value);
+    setVolume(newVolume);
+    videoRef.current.volume = newVolume;
+  };
+
   const handleStopClick = () => {
     const video = videoRef.current;
     video.pause();
@@ -131,29 +139,69 @@ const CustomVideoPlayer = ({
   const handleMuteClick = () => {
     const video = videoRef.current;
     video.muted = !video.muted;
+    if (video.muted) {
+      setVolume(0);
+    } else {
+      setVolume(0.5);
+    }
     setIsMuted(video.muted);
   };
 
   const handleFullScreenClick = () => {
     const player = document.querySelector(".custom-video-player");
-    if (!isFullScreen) {
-      if (player.requestFullscreen) {
-        player.requestFullscreen();
-      } else if (player.webkitRequestFullscreen) {
-        player.webkitRequestFullscreen();
-      } else if (player.msRequestFullscreen) {
-        player.msRequestFullscreen();
+
+    // Function to toggle fullscreen
+    const toggleFullScreen = () => {
+      if (!isFullScreen) {
+        if (player.requestFullscreen) {
+          player.requestFullscreen();
+        } else if (player.webkitRequestFullscreen) {
+          player.webkitRequestFullscreen();
+        } else if (player.msRequestFullscreen) {
+          player.msRequestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) {
+          document.msExitFullscreen();
+        }
       }
+      setIsFullScreen(!isFullScreen);
+    };
+
+    // Check if the device supports fullscreen
+    const supportsFullscreen = () => {
+      return (
+        document.fullscreenEnabled ||
+        document.webkitFullscreenEnabled ||
+        document.msFullscreenEnabled
+      );
+    };
+
+    // Toggle fullscreen if supported, else handle landscape mode
+    if (supportsFullscreen()) {
+      toggleFullScreen();
     } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      } else if (document.webkitExitFullscreen) {
-        document.webkitExitFullscreen();
-      } else if (document.msExitFullscreen) {
-        document.msExitFullscreen();
+      // Function to check if the device is in landscape mode
+      const isLandscape = () => {
+        return window.innerWidth > window.innerHeight;
+      };
+
+      // Toggle fullscreen when in landscape mode
+      if (isLandscape()) {
+        toggleFullScreen();
+      } else {
+        // Listen for orientation change event
+        window.addEventListener("orientationchange", () => {
+          if (isLandscape()) {
+            toggleFullScreen();
+          }
+        });
       }
     }
-    setIsFullScreen(!isFullScreen);
   };
 
   const handleMouseEnter = () => {
@@ -186,8 +234,10 @@ const CustomVideoPlayer = ({
         autoPlay={autoPlay}
         onEnded={handleVideoEnd}
         poster={thumbnail}
-        className="w-full h-auto" // Set a fixed width with auto height
+        className="w-full h-auto" // Set a fixed height for the video component
+        style={{ objectFit: "cover" }} // Ensure the thumbnail fits within the fixed height without stretching
       ></video>
+
       <div
         className={`controls transition-opacity duration-300 ${
           isControlsVisible ? "opacity-100" : "opacity-0 pointer-events-none"
@@ -198,8 +248,9 @@ const CustomVideoPlayer = ({
           value={currentTime}
           max={duration}
           onChange={handleSeek}
-          className="w-full"
+          className="w-full  accent-blue-500"
         />
+
         <div className="controls flex items-center justify-between">
           <div className="flex items-center">
             <button onClick={handlePlayPauseClick} className="mr-4">
@@ -214,6 +265,22 @@ const CustomVideoPlayer = ({
             </button>
             <span className="mr-2">{formatTime(currentTime)}</span> /{" "}
             <span className="ml-2 mr-4">{formatTime(duration)}</span>
+            <button onClick={handleMuteClick} className="mr-4">
+              {isMuted ? (
+                <FontAwesomeIcon icon={faVolumeMute} />
+              ) : (
+                <FontAwesomeIcon icon={faVolumeUp} />
+              )}
+            </button>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value={volume}
+              onChange={handleVolumeChange}
+              className="w-24 accent-white"
+            />
           </div>
           <div className="flex items-center">
             <select
@@ -226,13 +293,7 @@ const CustomVideoPlayer = ({
               <option value="1.5">1.5x</option>
               <option value="2">2x</option>
             </select>
-            <button onClick={handleMuteClick} className="mr-4">
-              {isMuted ? (
-                <FontAwesomeIcon icon={faVolumeMute} />
-              ) : (
-                <FontAwesomeIcon icon={faVolumeUp} />
-              )}
-            </button>
+
             <button onClick={handleFullScreenClick}>
               {isFullScreen ? (
                 <FontAwesomeIcon icon={faCompress} />

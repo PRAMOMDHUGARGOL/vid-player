@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import { useState } from "react";
 import PlayList from "@/components/Playlist";
 import { PLAY_LIST_JSON } from "@/lib/constants";
 import CustomVideoPlayer from "@/components/VideoPlayer";
@@ -9,109 +9,139 @@ export default function VideoPlayerPage() {
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   const [videos, setVideos] = useState(PLAY_LIST_JSON.categories[0].videos);
   const [isDragging, setIsDragging] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const filteredVideos = videos.filter((video) =>
+    video.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   function handleOnDragStart() {
     setIsDragging(true);
   }
 
   const handleNextVideo = () => {
-    if (currentVideoIndex < videos.length - 1) {
-      setCurrentVideoIndex((prevIndex) => prevIndex + 1);
-    } else {
-      setCurrentVideoIndex(0);
-    }
+    const nextIndex = (currentVideoIndex + 1) % filteredVideos.length;
+    setCurrentVideoIndex(nextIndex);
   };
 
   function handleOnDragEnd(result) {
     setIsDragging(false);
     if (!result.destination) return;
 
-    const items = Array.from(videos);
+    const items = Array.from(filteredVideos);
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
 
     setVideos(items);
 
-    // Find the index of the current video after reordering
     const newIndex = items.findIndex(
-      (item) => item === videos[currentVideoIndex]
+      (item) => item === filteredVideos[currentVideoIndex]
     );
 
-    // Update the currentVideoIndex state with the new index
     setCurrentVideoIndex(newIndex);
   }
 
   const selectVideo = (index) => {
     if (!isDragging) {
-      setCurrentVideoIndex(index);
+      // Find the index of the clicked video in the original videos array
+      const originalIndex = videos.findIndex(
+        (video) => video === filteredVideos[index]
+      );
+      // Update the currentVideoIndex state with the original index
+      setCurrentVideoIndex(originalIndex);
     }
   };
 
   return (
     <div className="container mx-auto p-5 md:px-0">
-      <h1 className="text-3xl font-bold mb-1">Pramodh's Video Player</h1>
-      <p className="text-lg text-gray-400 mb-8">
-        Enjoy watching your favorite videos!
-      </p>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="md:order-1">
+      <h1 className="text-3xl font-bold mb-6 text-center">
+        Pramodh's Video Player
+      </h1>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2">
           <CustomVideoPlayer
-            src={videos[currentVideoIndex]?.sources}
+            src={filteredVideos[currentVideoIndex]?.sources}
             autoPlay={true}
             onNextVideo={handleNextVideo}
-            thumbnail={videos[currentVideoIndex]?.images}
+            thumbnail={filteredVideos[currentVideoIndex]?.images}
           />
-          <div className=" bg-black bg-opacity-50 text-white py-5 mb-5 mx-auto">
+          <div className="bg-black bg-opacity-50 text-white py-5 mb-8 rounded-lg">
             <h2 className="text-2xl font-bold mb-2">
-              {videos[currentVideoIndex]?.title}
+              {filteredVideos[currentVideoIndex]?.title}
             </h2>
             <p className="text-lg mb-2">
-              {videos[currentVideoIndex]?.description}
+              {filteredVideos[currentVideoIndex]?.description}
             </p>
-            <p className="text-base">{videos[currentVideoIndex]?.subtitle}</p>
+            <p className="text-base">
+              {filteredVideos[currentVideoIndex]?.subtitle}
+            </p>
           </div>
         </div>
-
-        <div className="md:order-2">
-          <DragDropContext
-            onDragStart={handleOnDragStart}
-            onDragEnd={handleOnDragEnd}
-          >
-            <Droppable droppableId="video">
-              {(provided) => (
-                <ul
-                  {...provided.droppableProps}
-                  ref={provided.innerRef}
-                  className="playlist"
-                >
-                  {videos.map((video, index) => (
-                    <Draggable
-                      key={index.toString()}
-                      draggableId={index.toString()}
-                      index={index}
-                    >
-                      {(provided) => (
-                        <li
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          onClick={() => selectVideo(index.toString())}
-                          className="cursor-pointer"
-                        >
-                          <PlayList
-                            video={video}
-                            index={index}
-                            currentVideoIndex={currentVideoIndex}
-                          />
-                        </li>
-                      )}
-                    </Draggable>
-                  ))}
-                  {provided.placeholder}
-                </ul>
-              )}
-            </Droppable>
-          </DragDropContext>
+        <div className="playlist-wrapper lg:col-span-1">
+          <div className="playlist-wrapper bg-gray-900 rounded-lg p-4">
+            <h2 className="text-lg font-semibold text-white mb-4 flex items-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6 mr-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M4 6h16M4 12h16m-7 6h7"
+                />
+              </svg>
+              Playlist
+            </h2>
+            <input
+              type="text"
+              placeholder="Search videos"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full bg-gray-800 text-white placeholder-gray-300 px-4 py-2 rounded-md mb-4 focus:outline-none focus:ring focus:border-blue-500"
+            />
+            <DragDropContext
+              onDragStart={handleOnDragStart}
+              onDragEnd={handleOnDragEnd}
+            >
+              <Droppable droppableId="video">
+                {(provided) => (
+                  <ul
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                    className="playlist"
+                  >
+                    {filteredVideos.map((video, index) => (
+                      <Draggable
+                        key={index.toString()}
+                        draggableId={index.toString()}
+                        index={index}
+                      >
+                        {(provided) => (
+                          <li
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            onClick={() => selectVideo(index.toString())}
+                            className="cursor-pointer"
+                          >
+                            <PlayList
+                              video={video}
+                              index={index}
+                              currentVideoIndex={currentVideoIndex}
+                            />
+                          </li>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </ul>
+                )}
+              </Droppable>
+            </DragDropContext>
+          </div>
         </div>
       </div>
     </div>

@@ -1,30 +1,40 @@
 import { FaPlay } from "react-icons/fa";
 
 const PlayList = ({ video, currentVideoIndex, index }) => {
-  return (
-    <div className="flex mb-5 ">
-      <div className=" flex items-center pl-1 pr-2 text-sm font-medium text-white text-right">
-        {index === parseInt(currentVideoIndex) ? (
-          <div className="size-6 flex items-center justify-end mr-5">
-            <FaPlay />
-          </div>
-        ) : (
-          <span className="size-6 mr-5"> {index + 1}</span>
-        )}
-      </div>
+  const isActive = index === parseInt(currentVideoIndex);
 
-      <div className="relative h-24 lg:h-20 xl:h-24 w-40 min-w-[168px] lg:w-32 lg:min-w-[128px] xl:w-40 xl:min-w-[168px] rounded-xl bg-slate-800 overflow-hidden cursor-pointer">
-        <img className="h-full w-full object-cover" src={video.images} />
+  return (
+    <div
+      className={`relative flex items-center mb-4 gap-4 cursor-pointer rounded-lg transition-all duration-300 ${
+        isActive ? "bg-gray-700 shadow-md" : "hover:bg-gray-700"
+      }`}
+      style={{ width: "100%" }} // Set a fixed width for each playlist item
+    >
+      {/* Content */}
+      <div className="h-20 w-32 rounded-lg overflow-hidden flex-shrink-0">
+        <img
+          className="w-full h-full object-cover"
+          src={video.images}
+          alt={video.title}
+        />
       </div>
-      <div className="flex flex-col ml-3 overflow-hidden cursor-pointer">
-        <span className="text-sm lg:text-xs xl:text-sm font-bold line-clamp-2">
-          {video?.title}
-        </span>
-        <span className="text-[12px] lg:text-[10px] xl:text-[12px] font-semibold mt-2 text-black/[0.7] flex items-center">
-          {video?.subtitle}
-        </span>
+      <div className="flex flex-col flex-grow ml-3">
+        <h3
+          className="text-lg font-semibold text-white truncate mb-1"
+          style={{ maxWidth: "200px" }} // Set max width for the title
+          title={video.title} // Set title attribute for tooltip
+        >
+          {video.title}
+        </h3>
+        <p className="text-sm text-gray-300">{video.subtitle}</p>
       </div>
+      {isActive && (
+        <div className="flex justify-center items-center w-8 h-8 rounded-full bg-blue-500 text-white mr-4">
+          <FaPlay />
+        </div>
+      )}
     </div>
   );
 };
+
 export default PlayList;
