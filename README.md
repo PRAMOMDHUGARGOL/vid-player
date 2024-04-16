@@ -15,7 +15,6 @@ This Next.js project is a video player application that allows users to play vid
 
 - [Technologies Used](#technologies-used)
 - [Installation](#installation)
-- [Usage](#usage)
 - [Contributing](#contributing)
 - [Live Demo](#live-demo)
 
@@ -27,25 +26,25 @@ This Next.js project is a video player application that allows users to play vid
 
 ## Installation
 
-# Running the App Locally
+### Running the App Locally
 
 To run the app on your local machine, follow these steps:
 
-# Cloning the Repository
+### Cloning the Repository
 
 1. **Clone this repository** to your local machine using the following command:
    ```bash
    git clone <repository_url>
    ```
 
-# Navigating to the Project Directory
+### Navigating to the Project Directory
 
 2. **Navigate to the project directory** in your terminal:
    ```bash
    cd path/to/project-directory
    ```
 
-# Installing Dependencies
+### Installing Dependencies
 
 3. **Install the dependencies** required for the project by running:
 
@@ -55,7 +54,7 @@ To run the app on your local machine, follow these steps:
 
    This command will install all the necessary packages and libraries specified in the `package.json` file.
 
-# Starting the Development Server
+### Starting the Development Server
 
 4. **Run the development server** by executing the following command:
 
@@ -65,7 +64,7 @@ To run the app on your local machine, follow these steps:
 
    This command starts a local development server, allowing you to view and interact with the app in your browser.
 
-# Viewing the App
+### Viewing the App
 
 5. **Open your web browser** and navigate to [http://localhost:3000](http://localhost:3000) to view the app.
 
