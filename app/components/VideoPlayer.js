@@ -181,6 +181,7 @@ const CustomVideoPlayer = ({
     // Function to toggle fullscreen
     const toggleFullScreen = () => {
       if (!isFullScreen) {
+        // Request fullscreen
         if (player.requestFullscreen) {
           player.requestFullscreen();
         } else if (player.webkitRequestFullscreen) {
@@ -188,13 +189,22 @@ const CustomVideoPlayer = ({
         } else if (player.msRequestFullscreen) {
           player.msRequestFullscreen();
         }
+        // Force landscape orientation
+        if (screen.orientation && screen.orientation.lock) {
+          screen.orientation.lock("landscape");
+        }
       } else {
+        // Exit fullscreen
         if (document.exitFullscreen) {
           document.exitFullscreen();
         } else if (document.webkitExitFullscreen) {
           document.webkitExitFullscreen();
         } else if (document.msExitFullscreen) {
           document.msExitFullscreen();
+        }
+        // Unlock orientation
+        if (screen.orientation && screen.orientation.unlock) {
+          screen.orientation.unlock();
         }
       }
       setIsFullScreen(!isFullScreen);
