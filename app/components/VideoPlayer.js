@@ -242,7 +242,7 @@ const CustomVideoPlayer = ({
       <div
         className={`controls transition-opacity duration-300 ${
           isControlsVisible ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
+        } ${isFullScreen ? "fixed bottom-0 left-0 w-full" : ""}`}
       >
         <input
           type="range"
