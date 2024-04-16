@@ -4,7 +4,7 @@ This Next.js project is a video player application that allows users to play vid
 
 ## Light House Report
 
-![Light House](./src/assets/lightHouseReport.png)
+![Light House](./app/assets/lightHouseReport.png)
 
 ## Features
 
