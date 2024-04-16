@@ -6,8 +6,8 @@ const PlayList = ({ video, currentVideoIndex, index }) => {
   return (
     <div
       className={`relative flex items-center mb-4 gap-4 cursor-pointer rounded-lg transition-all duration-300 ${
-        isActive ? "bg-gray-700 shadow-md" : "hover:bg-gray-700"
-      }`}
+        isActive ? "bg-gray-700 shadow-md" : ""
+      } ${!isActive && "hover:md:bg-gray-700"}`}
       style={{ width: "100%" }} // Set a fixed width for each playlist item
     >
       {/* Thumbnail */}
@@ -22,7 +22,7 @@ const PlayList = ({ video, currentVideoIndex, index }) => {
       <div className="flex flex-col flex-grow ml-3">
         <h3
           className="text-lg font-semibold text-white mb-1"
-          style={{ maxWidth: "200px" }} // Set max width for the title
+          //   style={{ maxWidth: "200px" }} // Set max width for the title
           title={video.title} // Set title attribute for tooltip
         >
           {video.title}

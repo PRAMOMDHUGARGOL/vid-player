@@ -42,42 +42,44 @@ export default function VideoPlayerPage() {
 
   const selectVideo = (index) => {
     if (!isDragging) {
-      // Find the index of the clicked video in the original videos array
-      const originalIndex = videos.findIndex(
-        (video) => video === filteredVideos[index]
-      );
-      // Update the currentVideoIndex state with the original index
-      setCurrentVideoIndex(originalIndex);
+      // Find the index of the clicked video in the filteredVideos array
+      const clickedVideoIndex = parseInt(index); // Ensure index is parsed as integer
+      // Update the currentVideoIndex state with the clicked index
+      setCurrentVideoIndex(clickedVideoIndex);
     }
   };
 
   return (
-    <div className="container mx-auto p-2">
+    <div className="container mx-auto p-4 rounded-lg shadow-lg">
       <h1 className="text-3xl font-bold mb-6 text-center">
         Pramodh's Video Player
       </h1>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2">
-          <CustomVideoPlayer
-            src={filteredVideos[currentVideoIndex]?.sources}
-            autoPlay={true}
-            onNextVideo={handleNextVideo}
-            thumbnail={filteredVideos[currentVideoIndex]?.images}
-          />
-          <div className="bg-black bg-opacity-50 text-white py-5 mb-8 rounded-lg">
-            <h2 className="text-2xl font-bold mb-2">
-              {filteredVideos[currentVideoIndex]?.title}
-            </h2>
-            <p className="text-lg mb-2">
-              {filteredVideos[currentVideoIndex]?.description}
-            </p>
-            <p className="text-base">
-              {filteredVideos[currentVideoIndex]?.subtitle}
-            </p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="md:col-span-1">
+          {/* Video Player Section */}
+          <div className="rounded-lg overflow-hidden">
+            <CustomVideoPlayer
+              src={filteredVideos[currentVideoIndex]?.sources}
+              autoPlay={true}
+              onNextVideo={handleNextVideo}
+              thumbnail={filteredVideos[currentVideoIndex]?.images}
+            />
+            <div className="bg-gray-800 bg-opacity-50 text-white py-5 px-6">
+              <h2 className="text-2xl font-bold mb-2">
+                {filteredVideos[currentVideoIndex]?.title}
+              </h2>
+              <p className="text-lg mb-2">
+                {filteredVideos[currentVideoIndex]?.description}
+              </p>
+              <p className="text-base">
+                {filteredVideos[currentVideoIndex]?.subtitle}
+              </p>
+            </div>
           </div>
         </div>
-        <div className="playlist-wrapper lg:col-span-1">
-          <div className="playlist-wrapper bg-gray-900 rounded-lg p-4">
+        <div className="flex-1">
+          {/* Playlist Section */}
+          <div className="bg-gray-900 rounded-lg p-4">
             <h2 className="text-lg font-semibold text-white mb-4 flex items-center">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -89,7 +91,7 @@ export default function VideoPlayerPage() {
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth="2"
+                  strokeWidth={2}
                   d="M4 6h16M4 12h16m-7 6h7"
                 />
               </svg>

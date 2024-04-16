@@ -24,9 +24,9 @@ const CustomVideoPlayer = ({
   const [speed, setSpeed] = useState(1);
   const [isControlsVisible, setIsControlsVisible] = useState(true);
   const [volume, setVolume] = useState(0.5); // Initial volume level
+  const [hideVolumeControl, setHideVolumeControl] = useState(false);
 
   const videoRef = useRef(null);
-  const controlsTimeoutRef = useRef(null);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -78,6 +78,23 @@ const CustomVideoPlayer = ({
     }
   }, [isControlsVisible]);
 
+  useEffect(() => {
+    let hideTimer;
+    if (!isMuted && volume > 0) {
+      // Set a timer to hide the volume control after a delay (e.g., 3000 milliseconds)
+      hideTimer = setTimeout(() => {
+        setHideVolumeControl(true);
+      }, 5000); // Adjust the delay time as needed (3000 milliseconds = 3 seconds)
+    } else {
+      // If volume becomes zero or muted, clear the timer and show the volume control
+      clearTimeout(hideTimer);
+      setHideVolumeControl(false);
+    }
+
+    // Cleanup function to clear the timer when the component unmounts or conditions change
+    return () => clearTimeout(hideTimer);
+  }, [isMuted, volume]);
+
   const updateTime = () => {
     setCurrentTime(videoRef.current.currentTime);
   };
@@ -108,8 +125,15 @@ const CustomVideoPlayer = ({
 
   const handleVolumeChange = (event) => {
     const newVolume = parseFloat(event.target.value);
+    setIsMuted(newVolume === 0); // Set isMuted based on whether the volume is 0
     setVolume(newVolume);
     videoRef.current.volume = newVolume;
+
+    // Unmute the video if volume is greater than 0
+    if (newVolume > 0) {
+      videoRef.current.muted = false;
+      setIsMuted(false);
+    }
   };
 
   const handleStopClick = () => {
@@ -139,12 +163,16 @@ const CustomVideoPlayer = ({
   const handleMuteClick = () => {
     const video = videoRef.current;
     video.muted = !video.muted;
+
     if (video.muted) {
-      setVolume(0);
+      setVolume(0); // If muted, set volume to 0
+      video.volume = 0;
+      setIsMuted(video.muted);
     } else {
-      setVolume(0.5);
+      video.volume = 0.5;
+      setVolume(0.5); // If unmuted, set volume to half
+      setIsMuted(false); // If muted, set is muted
     }
-    setIsMuted(video.muted);
   };
 
   const handleFullScreenClick = () => {
@@ -172,41 +200,7 @@ const CustomVideoPlayer = ({
       setIsFullScreen(!isFullScreen);
     };
 
-    // Check if the device supports fullscreen
-    const supportsFullscreen = () => {
-      return (
-        document.fullscreenEnabled ||
-        document.webkitFullscreenEnabled ||
-        document.msFullscreenEnabled
-      );
-    };
-
-    // Toggle fullscreen if supported, else handle landscape mode
-    if (supportsFullscreen()) {
-      toggleFullScreen();
-    } else {
-      // Function to check if the device is in landscape mode
-      const isLandscape = () => {
-        return window.innerWidth > window.innerHeight;
-      };
-
-      // Toggle fullscreen when in landscape mode
-      if (isLandscape()) {
-        toggleFullScreen();
-      } else {
-        // Listen for orientation change event
-        const handleOrientationChange = () => {
-          if (isLandscape()) {
-            toggleFullScreen();
-            window.removeEventListener(
-              "orientationchange",
-              handleOrientationChange
-            );
-          }
-        };
-        window.addEventListener("orientationchange", handleOrientationChange);
-      }
-    }
+    toggleFullScreen();
   };
 
   const handleMouseEnter = () => {
@@ -231,6 +225,8 @@ const CustomVideoPlayer = ({
       className={`custom-video-player ${
         isControlsVisible ? "show-controls" : ""
       }`}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       <video
         ref={videoRef}
@@ -253,45 +249,57 @@ const CustomVideoPlayer = ({
           value={currentTime}
           max={duration}
           onChange={handleSeek}
-          className="w-full  accent-blue-500"
+          className="w-full accent-blue-500"
         />
 
-        <div className="controls flex items-center justify-between flex-wrap">
-          <div className="flex items-center mb-2 md:mb-0">
-            <button onClick={handlePlayPauseClick} className="mr-4">
+        <div className="controls flex flex-wrap justify-between items-center mb-2">
+          <div className="flex items-center">
+            <button onClick={handlePlayPauseClick} className="mr-2 md:mr-4">
               {isPlaying ? (
                 <FontAwesomeIcon icon={faPause} />
               ) : (
                 <FontAwesomeIcon icon={faPlay} />
               )}
             </button>
-            <button onClick={handleStopClick} className="mr-4">
+            <button onClick={handleStopClick} className="mr-2 md:mr-4">
               <FontAwesomeIcon icon={faStop} />
             </button>
-            <span className="mr-2 md:mr-4">{formatTime(currentTime)}</span> /{" "}
-            <span className="ml-2 md:ml-4">{formatTime(duration)}</span>
-            <button onClick={handleMuteClick} className="mr-4 ml-auto md:ml-4">
+            <span className="text-xs md:text-base mr-2">
+              {formatTime(currentTime)}
+            </span>{" "}
+            /{" "}
+            <span className="text-xs md:text-base ml-2">
+              {formatTime(duration)}
+            </span>
+            <button
+              onClick={handleMuteClick}
+              className="ml-2 md:ml-4 mr-2 md:mr-4"
+            >
               {isMuted ? (
                 <FontAwesomeIcon icon={faVolumeMute} />
               ) : (
                 <FontAwesomeIcon icon={faVolumeUp} />
               )}
             </button>
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.01"
-              value={volume}
-              onChange={handleVolumeChange}
-              className="w-24 accent-white"
-            />
+            {!isMuted || volume > 0 ? (
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={volume}
+                onChange={handleVolumeChange}
+                className={`w-16 md:w-24 accent-white ${
+                  isMuted || hideVolumeControl ? "hidden" : ""
+                }`}
+              />
+            ) : null}
           </div>
           <div className="flex items-center">
             <select
               value={speed}
               onChange={handleSpeedChange}
-              className="bg-transparent text-white px-2 py-1 rounded-md focus:outline-none mr-4 mb-2 md:mb-0"
+              className="bg-transparent text-xs md:text-base px-1 md:px-2 py-1 rounded-md focus:outline-none mr-2 md:mr-4 mb-2 md:mb-0"
             >
               <option value="0.5">0.5x</option>
               <option value="1">1x</option>
