@@ -2,6 +2,10 @@
 
 This Next.js project is a video player application that allows users to play videos from a playlist, navigate through the playlist, search for specific videos, and customize the player's appearance and behavior. The application is built using Next.js, providing a seamless and responsive video playback experience.
 
+## Light House Report
+
+![Light House](./src/assets/lightHouseReport.png)
+
 ## Features
 
 - **Video Playback**: Users can play videos from a playlist.
